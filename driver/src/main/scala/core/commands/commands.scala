@@ -15,17 +15,16 @@
  */
 package reactivemongo.core.commands
 
-import scala.util.{Try, Failure}
+import scala.util.{ Try, Failure }
 import reactivemongo.bson._
 import reactivemongo.bson.exceptions.DocumentKeyNotFound
 import DefaultBSONHandlers._
 import reactivemongo.core.errors._
 import reactivemongo.core.protocol.{ RequestMaker, Query, QueryFlags, Response }
-import reactivemongo.core.protocol.NodeState
-import reactivemongo.core.protocol.NodeState._
 import reactivemongo.core.netty._
 import reactivemongo.utils.option
 import reactivemongo.bson.utils.Converters
+import reactivemongo.core.nodeset.NodeStatus
 
 /**
  * A MongoDB Command.
@@ -248,7 +247,7 @@ case class LastError(
 
   /** Returns a `Stream` for all the elements of the [[reactivemongo.core.commands.LastError#originalDocument originalDocument]] if present, otherwise an empty `Stream`. */
   def elements: Stream[BSONElement] = originalDocument.map(_.elements).getOrElse(Stream.empty[BSONElement])
-    
+
   /**
    * Returns the [[reactivemongo.bson.BSONValue BSONValue]] associated with the given `key` of the [[reactivemongo.core.commands.LastError#originalDocument originalDocument]].
    *
@@ -273,7 +272,7 @@ case class LastError(
   def getUnflattenedTry(key: String): Try[Option[BSONValue]] = originalDocument.map(_.getUnflattenedTry(key)).getOrElse(Failure(DocumentKeyNotFound(key)))
 
   /**
-   * Returns the [[reactivemongo.bson.BSONValue BSONValue]] associated with the given `key` of the [[reactivemongo.core.commands.LastError#originalDocument originalDocument]], 
+   * Returns the [[reactivemongo.bson.BSONValue BSONValue]] associated with the given `key` of the [[reactivemongo.core.commands.LastError#originalDocument originalDocument]],
    * and converts it with the given implicit [[reactivemongo.bson.BSONReader BSONReader]].
    *
    * If there is no matching value, or the value could not be deserialized or converted, returns a `None`.
@@ -281,16 +280,16 @@ case class LastError(
   def getAs[T](s: String)(implicit reader: BSONReader[_ <: BSONValue, T]): Option[T] = originalDocument.flatMap(_.getAs[T](s))
 
   /**
-   * Returns the [[reactivemongo.bson.BSONValue BSONValue]] associated with the given `key` of the [[reactivemongo.core.commands.LastError#originalDocument originalDocument]], 
+   * Returns the [[reactivemongo.bson.BSONValue BSONValue]] associated with the given `key` of the [[reactivemongo.core.commands.LastError#originalDocument originalDocument]],
    * and converts it with the given implicit [[reactivemongo.bson.BSONReader BSONReader]].
    *
    * If there is no matching value, or the value could not be deserialized or converted, returns a `Failure`.
    * The `Failure` holds a [[reactivemongo.bson.exceptions.DocumentKeyNotFound DocumentKeyNotFound]] if the key could not be found.
-   */  
+   */
   def getAsTry[T](s: String)(implicit reader: BSONReader[_ <: BSONValue, T]): Try[T] = originalDocument.map(_.getAsTry[T](s)).getOrElse(Failure(DocumentKeyNotFound(s)))
-  
+
   /**
-   * Returns the [[reactivemongo.bson.BSONValue BSONValue]] associated with the given `key` of the [[reactivemongo.core.commands.LastError#originalDocument originalDocument]], 
+   * Returns the [[reactivemongo.bson.BSONValue BSONValue]] associated with the given `key` of the [[reactivemongo.core.commands.LastError#originalDocument originalDocument]],
    * and converts it with the given implicit [[reactivemongo.bson.BSONReader BSONReader]].
    *
    * If there is no matching value, returns a `Success` holding `None`.
@@ -503,7 +502,7 @@ case class IsMasterResponse(
     hosts: Option[Seq[String]],
     me: Option[String]) {
   /** the resolved [[reactivemongo.core.protocol.NodeState]] of the answering server */
-  lazy val state: NodeState = if (isMaster) PRIMARY else if (secondary) SECONDARY else UNKNOWN
+  val status: NodeStatus = if (isMaster) NodeStatus.Primary else if (secondary) NodeStatus.Secondary else NodeStatus.NonQueryableUnknownStatus
 }
 
 /** A modify operation, part of a FindAndModify command */

@@ -1,8 +1,8 @@
 # ReactiveMongo - Asynchronous & Non-Blocking Scala Driver for MongoDB
 
-[![Build Status](https://travis-ci.org/zenexity/ReactiveMongo.png?branch=master)](https://travis-ci.org/zenexity/ReactiveMongo)
+[![Build Status](https://travis-ci.org/ReactiveMongo/ReactiveMongo.png?branch=master)](https://travis-ci.org/ReactiveMongo/ReactiveMongo)
 
-[ReactiveMongo](https://github.com/zenexity/ReactiveMongo/) is a scala driver that provides fully non-blocking and asynchronous I/O operations.
+[ReactiveMongo](https://github.com/ReactiveMongo/ReactiveMongo/) is a scala driver that provides fully non-blocking and asynchronous I/O operations.
 
 ## Scale better, use less threads
 
@@ -86,7 +86,7 @@ def connect() {
 }
 ```
 
-A `MongoDriver` instance manages an actor system; a `connection` manages a pool of connections. In general, MongoDriver or create a MongoConnection are never instantiated more than once. You can provide a list of one ore more servers; the driver will guess if it's a standalone server or a replica set configuration. Even with one replica node, the driver will probe for other nodes and add them automatically.
+A `MongoDriver` instance manages an actor system; a `connection` manages a pool of connections. In general, MongoDriver or a MongoConnection are never instantiated more than once. You can provide a list of one or more servers; the driver will guess if it's a standalone server or a replica set configuration. Even with one replica node, the driver will probe for other nodes and add them automatically.
 ### Run a simple query
 
 ```scala
